@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Fee Tracker Pro</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Animated Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <i class="fas fa-graduation-cap header-icon"></i>
+                <h1 class="app-title">Student Fee Tracker Pro</h1>
+                <div class="header-subtitle">Manage your students and fees with ease</div>
+            </div>
+        </header>
+        
+        <!-- Enhanced Navigation with Icons -->
+        <nav class="nav-buttons">
+            <button id="studentsTab" class="nav-btn active" data-section="students">
+                <i class="fas fa-users"></i>
+                <span>Students</span>
+            </button>
+            <button id="feesTab" class="nav-btn" data-section="fees">
+                <i class="fas fa-money-bill-wave"></i>
+                <span>Fee Tracking</span>
+            </button>
+            <button id="reportsTab" class="nav-btn" data-section="reports">
+                <i class="fas fa-chart-bar"></i>
+                <span>Reports</span>
+            </button>
+        </nav>
+
+        <!-- Students Section -->
+        <div id="studentsSection" class="section active">
+            <div class="section-title">
+                <i class="fas fa-user-graduate"></i>
+                <h2>Student Management</h2>
+            </div>
+            
+            <!-- Add Student Form with Animation -->
+            <div class="form-container slide-in">
+                <div class="form-header">
+                    <i class="fas fa-plus-circle"></i>
+                    <h3>Add New Student</h3>
+                </div>
+                <form id="studentForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="studentName">
+                                <i class="fas fa-user"></i>
+                                Student Name <span class="required">*</span>
+                            </label>
+                            <input type="text" id="studentName" required placeholder="Enter full name">
+                        </div>
+                        <div class="form-group">
+                            <label for="studentClass">
+                                <i class="fas fa-school"></i>
+                                Class <span class="required">*</span>
+                            </label>
+                            <input type="text" id="studentClass" required placeholder="e.g., 10th A, 12th Science">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="studentRoll">
+                                <i class="fas fa-id-card"></i>
+                                Roll Number <span class="required">*</span>
+                            </label>
+                            <input type="text" id="studentRoll" required placeholder="Unique roll number">
+                        </div>
+                        <div class="form-group">
+                            <label for="monthlyFee">
+                                <i class="fas fa-rupee-sign"></i>
+                                Monthly Fee (₹) <span class="required">*</span>
+                            </label>
+                            <input type="number" id="monthlyFee" required min="0" placeholder="Amount in rupees">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="parentContact">
+                                <i class="fas fa-phone"></i>
+                                Parent Contact
+                            </label>
+                            <input type="tel" id="parentContact" placeholder="Phone number">
+                        </div>
+                        <div class="form-group">
+                            <label for="joiningDate">
+                                <i class="fas fa-calendar-alt"></i>
+                                Joining Date <span class="required">*</span>
+                            </label>
+                            <input type="date" id="joiningDate" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-primary ripple-effect">
+                        <i class="fas fa-plus"></i>
+                        Add Student
+                    </button>
+                </form>
+            </div>
+
+            <!-- Students List with Enhanced Cards -->
+            <div class="students-list slide-in">
+                <div class="section-header">
+                    <h3><i class="fas fa-list"></i> All Students</h3>
+                    <div class="student-actions">
+                        <button id="exportStudents" class="btn-secondary ripple-effect">
+                            <i class="fas fa-download"></i>
+                            Export
+                        </button>
+                        <div class="search-container">
+                            <i class="fas fa-search search-icon"></i>
+                            <input type="text" id="searchStudents" placeholder="Search students..." class="search-input">
+                        </div>
+                    </div>
+                </div>
+                <div id="studentsList" class="cards-grid"></div>
+            </div>
+        </div>
+
+        <!-- Enhanced Fees Section -->
+        <div id="feesSection" class="section">
+            <div class="section-title">
+                <i class="fas fa-money-check-alt"></i>
+                <h2>Fee Tracking</h2>
+            </div>
+            
+            <!-- Fee Entry Form -->
+            <div class="form-container slide-in">
+                <div class="form-header">
+                    <i class="fas fa-receipt"></i>
+                    <h3>Record Fee Payment</h3>
+                </div>
+                <form id="feeForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="feeStudent">
+                                <i class="fas fa-user-check"></i>
+                                Select Student <span class="required">*</span>
+                            </label>
+                            <select id="feeStudent" required>
+                                <option value="">Choose a student...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="feeMonth">
+                                <i class="fas fa-calendar"></i>
+                                Month <span class="required">*</span>
+                            </label>
+                            <select id="feeMonth" required>
+                                <option value="">Select month...</option>
+                                <option value="January">January</option>
+                                <option value="February">February</option>
+                                <option value="March">March</option>
+                                <option value="April">April</option>
+                                <option value="May">May</option>
+                                <option value="June">June</option>
+                                <option value="July">July</option>
+                                <option value="August">August</option>
+                                <option value="September">September</option>
+                                <option value="October">October</option>
+                                <option value="November">November</option>
+                                <option value="December">December</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="feeYear">
+                                <i class="fas fa-calendar-alt"></i>
+                                Year <span class="required">*</span>
+                            </label>
+                            <input type="number" id="feeYear" value="2025" min="2020" max="2030" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="feeAmount">
+                                <i class="fas fa-rupee-sign"></i>
+                                Amount Paid (₹) <span class="required">*</span>
+                            </label>
+                            <input type="number" id="feeAmount" required min="0" step="0.01">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="paymentDate">
+                                <i class="fas fa-calendar-check"></i>
+                                Payment Date <span class="required">*</span>
+                            </label>
+                            <input type="date" id="paymentDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="paymentStatus">
+                                <i class="fas fa-check-circle"></i>
+                                Status <span class="required">*</span>
+                            </label>
+                            <select id="paymentStatus" required>
+                                <option value="Paid">Paid</option>
+                                <option value="Partial">Partial Payment</option>
+                                <option value="Pending">Pending</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="paymentNotes">
+                            <i class="fas fa-sticky-note"></i>
+                            Notes
+                        </label>
+                        <textarea id="paymentNotes" placeholder="Additional notes about payment" rows="3"></textarea>
+                    </div>
+                    <button type="submit" class="btn-primary ripple-effect">
+                        <i class="fas fa-save"></i>
+                        Record Payment
+                    </button>
+                </form>
+            </div>
+
+            <!-- Enhanced Student-Centric Fee Tracking -->
+            <div class="fee-tracking-container slide-in">
+                <div class="section-header">
+                    <h3><i class="fas fa-users"></i> Students Fee Overview</h3>
+                    <div class="view-controls">
+                        <button id="exportFees" class="btn-secondary ripple-effect">
+                            <i class="fas fa-download"></i>
+                            Export Records
+                        </button>
+                        <button id="backToStudentsList" class="btn-info ripple-effect" style="display: none;">
+                            <i class="fas fa-arrow-left"></i>
+                            Back to Students
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Search and Filter for Students -->
+                <div class="student-search-container">
+                    <div class="search-container">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" id="searchFeeStudents" placeholder="Search students..." class="search-input">
+                    </div>
+                    <div class="filter-buttons">
+                        <button id="showAllStudents" class="filter-btn active">All Students</button>
+                        <button id="showPaidStudents" class="filter-btn">Up to Date</button>
+                        <button id="showPendingStudents" class="filter-btn">Pending Payments</button>
+                    </div>
+                </div>
+
+                <!-- Students List View -->
+                <div id="studentsListView" class="students-fee-overview">
+                    <!-- Student cards will be populated here -->
+                </div>
+
+                <!-- Individual Student Fee Details View -->
+                <div id="studentDetailView" class="student-detail-container" style="display: none;">
+                    <div id="studentDetailContent">
+                        <!-- Individual student's fee details will be shown here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reports Section -->
+        <div id="reportsSection" class="section">
+            <div class="section-title">
+                <i class="fas fa-chart-line"></i>
+                <h2>Reports & Analytics</h2>
+            </div>
+            
+            <div class="reports-container">
+                <div class="report-card glass-effect slide-in" style="animation-delay: 0.1s">
+                    <div class="card-header">
+                        <i class="fas fa-calendar-check"></i>
+                        <h3>Monthly Summary</h3>
+                    </div>
+                    <div id="monthlySummary" class="card-content"></div>
+                </div>
+                
+                <div class="report-card glass-effect slide-in" style="animation-delay: 0.2s">
+                    <div class="card-header">
+                        <i class="fas fa-chart-pie"></i>
+                        <h3>Payment Status Overview</h3>
+                    </div>
+                    <div id="paymentOverview" class="card-content"></div>
+                </div>
+                
+                <div class="report-card glass-effect slide-in" style="animation-delay: 0.3s">
+                    <div class="card-header">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <h3>Outstanding Fees</h3>
+                    </div>
+                    <div id="outstandingFees" class="card-content"></div>
+                </div>
+                
+                <div class="report-card glass-effect slide-in" style="animation-delay: 0.4s">
+                    <div class="card-header">
+                        <i class="fas fa-tools"></i>
+                        <h3>Quick Actions</h3>
+                    </div>
+                    <div class="quick-actions card-content">
+                        <button id="generateReport" class="btn-primary ripple-effect">
+                            <i class="fas fa-file-alt"></i>
+                            Generate Full Report
+                        </button>
+                        <button id="exportAll" class="btn-secondary ripple-effect">
+                            <i class="fas fa-database"></i>
+                            Export All Data
+                        </button>
+                        <button id="clearAllData" class="btn-danger ripple-effect">
+                            <i class="fas fa-trash-alt"></i>
+                            Clear All Data
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div id="loadingSpinner" class="loading-spinner">
+        <div class="spinner"></div>
+        <div class="loading-text">Processing...</div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- Edit Student Modal -->
+    <div id="editStudentModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-edit"></i> Edit Student Details</h3>
+                <button class="close-btn" onclick="window.feeTracker.closeEditStudentModal()">×</button>
+            </div>
+            <form id="editStudentForm">
+                <input type="hidden" id="editStudentId">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editStudentName">
+                            <i class="fas fa-user"></i>
+                            Student Name <span class="required">*</span>
+                        </label>
+                        <input type="text" id="editStudentName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editStudentClass">
+                            <i class="fas fa-school"></i>
+                            Class <span class="required">*</span>
+                        </label>
+                        <input type="text" id="editStudentClass" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editStudentRoll">
+                            <i class="fas fa-id-card"></i>
+                            Roll Number <span class="required">*</span>
+                        </label>
+                        <input type="text" id="editStudentRoll" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editMonthlyFee">
+                            <i class="fas fa-rupee-sign"></i>
+                            Monthly Fee (₹) <span class="required">*</span>
+                        </label>
+                        <input type="number" id="editMonthlyFee" required min="0">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editParentContact">
+                            <i class="fas fa-phone"></i>
+                            Parent Contact
+                        </label>
+                        <input type="tel" id="editParentContact">
+                    </div>
+                    <div class="form-group">
+                        <label for="editJoiningDate">
+                            <i class="fas fa-calendar-alt"></i>
+                            Joining Date <span class="required">*</span>
+                        </label>
+                        <input type="date" id="editJoiningDate" required>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" onclick="window.feeTracker.closeEditStudentModal()">Cancel</button>
+                    <button type="submit" class="btn-primary ripple-effect">
+                        <i class="fas fa-save"></i>
+                        Update Student
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Fee Record Modal -->
+    <div id="editFeeModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-edit"></i> Edit Fee Record</h3>
+                <button class="close-btn" onclick="window.feeTracker.closeEditFeeModal()">×</button>
+            </div>
+            <form id="editFeeForm">
+                <input type="hidden" id="editFeeId">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editFeeStudent">
+                            <i class="fas fa-user-check"></i>
+                            Student <span class="required">*</span>
+                        </label>
+                        <select id="editFeeStudent" required disabled>
+                            <option value="">Choose a student...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editFeeMonth">
+                            <i class="fas fa-calendar"></i>
+                            Month <span class="required">*</span>
+                        </label>
+                        <select id="editFeeMonth" required>
+                            <option value="">Select month...</option>
+                            <option value="January">January</option>
+                            <option value="February">February</option>
+                            <option value="March">March</option>
+                            <option value="April">April</option>
+                            <option value="May">May</option>
+                            <option value="June">June</option>
+                            <option value="July">July</option>
+                            <option value="August">August</option>
+                            <option value="September">September</option>
+                            <option value="October">October</option>
+                            <option value="November">November</option>
+                            <option value="December">December</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editFeeYear">
+                            <i class="fas fa-calendar-alt"></i>
+                            Year <span class="required">*</span>
+                        </label>
+                        <input type="number" id="editFeeYear" min="2020" max="2030" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editFeeAmount">
+                            <i class="fas fa-rupee-sign"></i>
+                            Amount Paid (₹) <span class="required">*</span>
+                        </label>
+                        <input type="number" id="editFeeAmount" required min="0" step="0.01">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editPaymentDate">
+                            <i class="fas fa-calendar-check"></i>
+                            Payment Date <span class="required">*</span>
+                        </label>
+                        <input type="date" id="editPaymentDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editPaymentStatus">
+                            <i class="fas fa-check-circle"></i>
+                            Status <span class="required">*</span>
+                        </label>
+                        <select id="editPaymentStatus" required>
+                            <option value="Paid">Paid</option>
+                            <option value="Partial">Partial Payment</option>
+                            <option value="Pending">Pending</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="editPaymentNotes">
+                        <i class="fas fa-sticky-note"></i>
+                        Notes
+                    </label>
+                    <textarea id="editPaymentNotes" rows="3"></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" onclick="window.feeTracker.closeEditFeeModal()">Cancel</button>
+                    <button type="submit" class="btn-primary ripple-effect">
+                        <i class="fas fa-save"></i>
+                        Update Record
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
