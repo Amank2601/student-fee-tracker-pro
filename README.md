@@ -47,7 +47,7 @@ A modern, responsive web application for managing student fees and payments. Bui
 
 ## 🚀 Live Demo
 
-[**🔗 Try the live demo here**](https://your-username.github.io/student-fee-tracker-pro)
+[**🔗 Try the live demo here**](https://amank2601.github.io/student-fee-tracker-pro/)
 
 ## 📱 Screenshots
 
@@ -82,6 +82,6 @@ A modern, responsive web application for managing student fees and payments. Bui
    - Go to Settings → Pages
    - Select "Deploy from a branch"
    - Choose "main" branch
-   - Your app will be live at: `https://your-username.github.io/student-fee-tracker-pro`
+   - Your app will be live at: `https://amank2601.github.io/student-fee-tracker-pro/`
 
 ### Option 3: Clone Repository
