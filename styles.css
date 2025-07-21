@@ -54,7 +54,7 @@ body {
     justify-content: space-between;
     align-items: center;
     box-shadow: var(--shadow-lg);
-    position: sticky;
+    position: relative;
     top: 20px;
     z-index: 100;
 }
