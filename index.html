@@ -9,30 +9,42 @@
 </head>
 <body>
     <div class="container">
-        <!-- Navigation Bar -->
+        <!-- Navigation Bar with Mobile Toggle -->
         <nav class="top-navbar">
             <div class="navbar-brand">
                 <i class="fas fa-graduation-cap"></i>
                 <span>Student Fee Tracker Pro</span>
             </div>
-            <div class="navbar-menu">
+            
+            <!-- Mobile Menu Toggle Button -->
+            <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            </button>
+            
+            <!-- Navigation Menu -->
+            <div class="navbar-menu" id="navbarMenu">
                 <button id="homeNavBtn" class="nav-link active">
                     <i class="fas fa-home"></i>
-                    Home
+                    <span>Home</span>
                 </button>
                 <button id="studentsNavBtn" class="nav-link">
                     <i class="fas fa-users"></i>
-                    Students
+                    <span>Students</span>
                 </button>
                 <button id="feesNavBtn" class="nav-link">
                     <i class="fas fa-money-bill-wave"></i>
-                    Fee Tracking
+                    <span>Fee Tracking</span>
                 </button>
                 <button id="reportsNavBtn" class="nav-link">
                     <i class="fas fa-chart-bar"></i>
-                    Reports
+                    <span>Reports</span>
                 </button>
             </div>
+            
+            <!-- Mobile Menu Overlay -->
+            <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
         </nav>
 
         <!-- Homepage Section -->
