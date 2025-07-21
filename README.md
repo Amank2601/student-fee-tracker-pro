@@ -55,7 +55,7 @@ A modern, responsive web application for managing student fees and payments. Bui
 <details>
 <summary>Click to view desktop screenshots</summary>
 
-![Student Management](assets/homepage.jpg)
+![Student Management](assests/homepage.jpg)
 
 </details>
 
@@ -63,8 +63,8 @@ A modern, responsive web application for managing student fees and payments. Bui
 <details>
 <summary>Click to view mobile screenshots</summary>
 
-![Mobile Students](screenshots/mobile-students.png)
-![Mobile Fee Details](screenshots/mobile-fee-details.png)
+![Mobile Students](assests/mobile-homepage.jpg)
+![Mobile Fee Details](assests/mobile-feestracker.jpg)
 
 </details>
 
