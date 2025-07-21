@@ -1,4 +1,4 @@
-// Student Fee Tracker Application - Complete Working Version with Mobile Menu
+// Student Fee Tracker Application - Complete Working Version
 class StudentFeeTracker {
     constructor() {
         this.students = JSON.parse(localStorage.getItem('students')) || [];
@@ -118,95 +118,6 @@ class StudentFeeTracker {
         if (studentsNavBtn) studentsNavBtn.onclick = () => this.showSection('students');
         if (feesNavBtn) feesNavBtn.onclick = () => this.showSection('fees');
         if (reportsNavBtn) reportsNavBtn.onclick = () => this.showSection('reports');
-
-        // Mobile menu functionality
-        this.setupMobileMenu();
-    }
-
-    setupMobileMenu() {
-        const mobileMenuToggle = document.getElementById('mobileMenuToggle');
-        const navbarMenu = document.getElementById('navbarMenu');
-        const mobileMenuOverlay = document.getElementById('mobileMenuOverlay');
-        const navLinks = document.querySelectorAll('.nav-link');
-
-        if (!mobileMenuToggle || !navbarMenu || !mobileMenuOverlay) return;
-
-        // Toggle mobile menu
-        const toggleMobileMenu = () => {
-            const isOpen = navbarMenu.classList.contains('mobile-open');
-            
-            if (isOpen) {
-                this.closeMobileMenu();
-            } else {
-                this.openMobileMenu();
-            }
-        };
-
-        // Open mobile menu
-        this.openMobileMenu = () => {
-            mobileMenuToggle.classList.add('active');
-            navbarMenu.classList.add('mobile-open');
-            mobileMenuOverlay.style.display = 'block';
-            mobileMenuOverlay.classList.add('active');
-            document.body.classList.add('mobile-menu-open');
-            
-            // Animate nav links
-            navLinks.forEach((link, index) => {
-                link.style.animationDelay = `${index * 0.1}s`;
-                link.classList.add('slide-in');
-            });
-        };
-
-        // Close mobile menu
-        this.closeMobileMenu = () => {
-            mobileMenuToggle.classList.remove('active');
-            navbarMenu.classList.remove('mobile-open');
-            mobileMenuOverlay.classList.remove('active');
-            document.body.classList.remove('mobile-menu-open');
-            
-            setTimeout(() => {
-                mobileMenuOverlay.style.display = 'none';
-            }, 300);
-            
-            navLinks.forEach(link => {
-                link.classList.remove('slide-in');
-            });
-        };
-
-        // Event listeners
-        mobileMenuToggle.addEventListener('click', toggleMobileMenu);
-        mobileMenuOverlay.addEventListener('click', this.closeMobileMenu);
-
-        // Close menu when clicking the X button
-        navbarMenu.addEventListener('click', (e) => {
-            if (e.target === navbarMenu.querySelector('::after') || 
-                (e.clientX > navbarMenu.offsetWidth - 50 && e.clientY < 50)) {
-                this.closeMobileMenu();
-            }
-        });
-
-        // Close menu when nav link is clicked
-        navLinks.forEach(link => {
-            link.addEventListener('click', () => {
-                if (window.innerWidth <= 768) {
-                    setTimeout(() => this.closeMobileMenu(), 200);
-                }
-            });
-        });
-
-        // Close menu on window resize if desktop
-        window.addEventListener('resize', () => {
-            if (window.innerWidth > 768) {
-                this.closeMobileMenu();
-            }
-        });
-
-        // Close menu with escape key
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && navbarMenu.classList.contains('mobile-open')) {
-                this.closeMobileMenu();
-            }
-        });
     }
 
     showSection(section) {
