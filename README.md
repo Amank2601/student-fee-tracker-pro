@@ -47,7 +47,7 @@ A modern, responsive web application for managing student fees and payments. Bui
 
 ## 🚀 Live Demo
 
-[**🔗 Try the live demo here**](https://amank2601.github.io/student-fee-tracker-pro/)
+[**🔗 Try the live demo here**](https://students-fee-tracker.netlify.app/)
 
 ## 📱 Screenshots
 
