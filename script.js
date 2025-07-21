@@ -1,4 +1,4 @@
-// Student Fee Tracker Application - Enhanced Version with Complete Edit Functionality
+// Student Fee Tracker Application - Complete Working Version
 class StudentFeeTracker {
     constructor() {
         this.students = JSON.parse(localStorage.getItem('students')) || [];
@@ -10,378 +10,262 @@ class StudentFeeTracker {
 
     init() {
         if (this.isInitialized) return;
+        
+        // Wait for DOM to be ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => this.initializeApp());
+        } else {
+            this.initializeApp();
+        }
+    }
+
+    initializeApp() {
         this.setupEventListeners();
         this.setupFeeTrackingEventListeners();
         this.setupEditEventListeners();
+        this.setupHomeEventListeners();
         this.displayStudents();
         this.populateStudentDropdowns();
         this.displayFeeRecords();
         this.generateReports();
+        this.updateHomepageStats();
+        this.displayRecentActivity();
         this.setupAnimations();
         this.isInitialized = true;
         console.log('Student Fee Tracker initialized successfully');
     }
 
     setupEventListeners() {
-        this.resetEventListeners();
+        // Navigation buttons
+        const studentsTab = document.getElementById('studentsTab');
+        const feesTab = document.getElementById('feesTab');
+        const reportsTab = document.getElementById('reportsTab');
 
-        // Navigation
-        document.getElementById('studentsTab').onclick = () => this.showSection('students');
-        document.getElementById('feesTab').onclick = () => this.showSection('fees');
-        document.getElementById('reportsTab').onclick = () => this.showSection('reports');
+        if (studentsTab) studentsTab.onclick = () => this.showSection('students');
+        if (feesTab) feesTab.onclick = () => this.showSection('fees');
+        if (reportsTab) reportsTab.onclick = () => this.showSection('reports');
 
         // Forms
-        document.getElementById('studentForm').onsubmit = (e) => this.addStudent(e);
-        document.getElementById('feeForm').onsubmit = (e) => this.addFeeRecord(e);
+        const studentForm = document.getElementById('studentForm');
+        const feeForm = document.getElementById('feeForm');
 
-        // Search with debounce
-        document.getElementById('searchStudents').oninput = (e) => this.debounce(() => {
-            this.searchStudents(e.target.value);
-        }, 300)();
+        if (studentForm) studentForm.onsubmit = (e) => this.addStudent(e);
+        if (feeForm) feeForm.onsubmit = (e) => this.addFeeRecord(e);
+
+        // Search functionality
+        const searchStudents = document.getElementById('searchStudents');
+        if (searchStudents) {
+            searchStudents.oninput = (e) => this.debounce(() => {
+                this.searchStudents(e.target.value);
+            }, 300)();
+        }
 
         // Export buttons
-        document.getElementById('exportStudents').onclick = () => this.exportStudents();
-        document.getElementById('exportFees').onclick = () => this.exportFeeRecords();
-        document.getElementById('exportAll').onclick = () => this.exportAllData();
-        document.getElementById('generateReport').onclick = () => this.generateFullReport();
-        document.getElementById('clearAllData').onclick = () => this.clearAllData();
+        const exportStudents = document.getElementById('exportStudents');
+        const exportFees = document.getElementById('exportFees');
+        const exportAll = document.getElementById('exportAll');
+        const generateReport = document.getElementById('generateReport');
+        const clearAllData = document.getElementById('clearAllData');
+
+        if (exportStudents) exportStudents.onclick = () => this.exportStudents();
+        if (exportFees) exportFees.onclick = () => this.exportFeeRecords();
+        if (exportAll) exportAll.onclick = () => this.exportAllData();
+        if (generateReport) generateReport.onclick = () => this.generateFullReport();
+        if (clearAllData) clearAllData.onclick = () => this.clearAllData();
 
         // Set default dates
-        document.getElementById('paymentDate').value = new Date().toISOString().split('T')[0];
-        document.getElementById('joiningDate').value = new Date().toISOString().split('T')[0];
+        const paymentDate = document.getElementById('paymentDate');
+        const joiningDate = document.getElementById('joiningDate');
+        
+        if (paymentDate) paymentDate.value = new Date().toISOString().split('T')[0];
+        if (joiningDate) joiningDate.value = new Date().toISOString().split('T')[0];
     }
 
     setupFeeTrackingEventListeners() {
-        // Back button
-        document.getElementById('backToStudentsList').onclick = () => this.showStudentsListView();
-        
-        // Filter buttons
-        document.getElementById('showAllStudents').onclick = () => this.filterStudentsByPaymentStatus('all');
-        document.getElementById('showPaidStudents').onclick = () => this.filterStudentsByPaymentStatus('paid');
-        document.getElementById('showPendingStudents').onclick = () => this.filterStudentsByPaymentStatus('pending');
-        
-        // Search functionality
-        document.getElementById('searchFeeStudents').oninput = (e) => this.debounce(() => {
-            this.searchStudentsForFees(e.target.value);
-        }, 300)();
+        const backToStudentsList = document.getElementById('backToStudentsList');
+        const showAllStudents = document.getElementById('showAllStudents');
+        const showPaidStudents = document.getElementById('showPaidStudents');
+        const showPendingStudents = document.getElementById('showPendingStudents');
+        const searchFeeStudents = document.getElementById('searchFeeStudents');
+
+        if (backToStudentsList) backToStudentsList.onclick = () => this.showStudentsListView();
+        if (showAllStudents) showAllStudents.onclick = () => this.filterStudentsByPaymentStatus('all');
+        if (showPaidStudents) showPaidStudents.onclick = () => this.filterStudentsByPaymentStatus('paid');
+        if (showPendingStudents) showPendingStudents.onclick = () => this.filterStudentsByPaymentStatus('pending');
+
+        if (searchFeeStudents) {
+            searchFeeStudents.oninput = (e) => this.debounce(() => {
+                this.searchStudentsForFees(e.target.value);
+            }, 300)();
+        }
     }
 
     setupEditEventListeners() {
-        // Edit student form
-        document.getElementById('editStudentForm').onsubmit = (e) => this.updateStudent(e);
-        
-        // Edit fee form
-        document.getElementById('editFeeForm').onsubmit = (e) => this.updateFeeRecord(e);
+        const editStudentForm = document.getElementById('editStudentForm');
+        const editFeeForm = document.getElementById('editFeeForm');
+
+        if (editStudentForm) editStudentForm.onsubmit = (e) => this.updateStudent(e);
+        if (editFeeForm) editFeeForm.onsubmit = (e) => this.updateFeeRecord(e);
     }
 
-    openEditStudentModal(studentId) {
-        const student = this.students.find(s => s.id === studentId);
-        if (!student) return;
+    setupHomeEventListeners() {
+        const homeNavBtn = document.getElementById('homeNavBtn');
+        const studentsNavBtn = document.getElementById('studentsNavBtn');
+        const feesNavBtn = document.getElementById('feesNavBtn');
+        const reportsNavBtn = document.getElementById('reportsNavBtn');
 
-        // Populate form with current student data
-        document.getElementById('editStudentId').value = student.id;
-        document.getElementById('editStudentName').value = student.name;
-        document.getElementById('editStudentClass').value = student.class;
-        document.getElementById('editStudentRoll').value = student.rollNumber;
-        document.getElementById('editMonthlyFee').value = student.monthlyFee;
-        document.getElementById('editParentContact').value = student.parentContact || '';
-        document.getElementById('editJoiningDate').value = student.joiningDate;
-
-        // Show modal
-        document.getElementById('editStudentModal').style.display = 'flex';
-    }
-
-    closeEditStudentModal() {
-        document.getElementById('editStudentModal').style.display = 'none';
-        document.getElementById('editStudentForm').reset();
-    }
-
-    updateStudent(e) {
-        e.preventDefault();
-        
-        const submitBtn = e.target.querySelector('button[type="submit"]');
-        submitBtn.disabled = true;
-        this.showLoading();
-        
-        try {
-            const studentId = document.getElementById('editStudentId').value;
-            const name = document.getElementById('editStudentName').value?.trim();
-            const studentClass = document.getElementById('editStudentClass').value?.trim();
-            const rollNumber = document.getElementById('editStudentRoll').value?.trim();
-            const monthlyFee = parseFloat(document.getElementById('editMonthlyFee').value);
-            const parentContact = document.getElementById('editParentContact').value?.trim() || '';
-            const joiningDate = document.getElementById('editJoiningDate').value;
-
-            if (!name || !studentClass || !rollNumber || isNaN(monthlyFee) || !joiningDate) {
-                throw new Error('Please fill in all required fields correctly!');
-            }
-
-            // Check for duplicate roll number (excluding current student)
-            if (this.students.some(s => s.rollNumber === rollNumber && s.id !== studentId)) {
-                throw new Error('A student with this roll number already exists!');
-            }
-
-            // Find and update student
-            const studentIndex = this.students.findIndex(s => s.id === studentId);
-            if (studentIndex !== -1) {
-                this.students[studentIndex] = {
-                    ...this.students[studentIndex],
-                    name,
-                    class: studentClass,
-                    rollNumber,
-                    monthlyFee,
-                    parentContact,
-                    joiningDate,
-                    lastModified: new Date().toLocaleDateString()
-                };
-
-                this.saveData();
-                this.displayStudents();
-                this.populateStudentDropdowns();
-                this.displayStudentsFeeOverview();
-                
-                this.closeEditStudentModal();
-                this.showToast('Student updated successfully! 🎉', 'success');
-            }
-
-        } catch (error) {
-            this.showToast(error.message, 'error');
-        } finally {
-            this.hideLoading();
-            setTimeout(() => {
-                submitBtn.disabled = false;
-            }, 1000);
-        }
-    }
-
-    openEditFeeModal(recordId) {
-        const record = this.feeRecords.find(r => r.id === recordId);
-        if (!record) return;
-
-        // Populate dropdown with students
-        this.populateEditFeeStudentDropdown();
-
-        // Populate form with current record data
-        document.getElementById('editFeeId').value = record.id;
-        document.getElementById('editFeeStudent').value = record.studentId;
-        document.getElementById('editFeeMonth').value = record.month;
-        document.getElementById('editFeeYear').value = record.year;
-        document.getElementById('editFeeAmount').value = record.amount;
-        document.getElementById('editPaymentDate').value = record.paymentDate;
-        document.getElementById('editPaymentStatus').value = record.status;
-        document.getElementById('editPaymentNotes').value = record.notes || '';
-
-        // Show modal
-        document.getElementById('editFeeModal').style.display = 'flex';
-    }
-
-    closeEditFeeModal() {
-        document.getElementById('editFeeModal').style.display = 'none';
-        document.getElementById('editFeeForm').reset();
-    }
-
-    populateEditFeeStudentDropdown() {
-        const select = document.getElementById('editFeeStudent');
-        
-        // Clear existing options (except first)
-        while (select.children.length > 1) {
-            select.removeChild(select.lastChild);
-        }
-        
-        // Add student options
-        this.students.forEach(student => {
-            const option = document.createElement('option');
-            option.value = student.id;
-            option.textContent = `${student.name} (${student.class})`;
-            select.appendChild(option);
-        });
-    }
-
-    updateFeeRecord(e) {
-        e.preventDefault();
-        
-        const submitBtn = e.target.querySelector('button[type="submit"]');
-        submitBtn.disabled = true;
-        this.showLoading();
-        
-        try {
-            const recordId = document.getElementById('editFeeId').value;
-            const studentId = document.getElementById('editFeeStudent').value;
-            const month = document.getElementById('editFeeMonth').value;
-            const year = parseInt(document.getElementById('editFeeYear').value);
-            const amount = parseFloat(document.getElementById('editFeeAmount').value);
-            const paymentDate = document.getElementById('editPaymentDate').value;
-            const status = document.getElementById('editPaymentStatus').value;
-            const notes = document.getElementById('editPaymentNotes').value?.trim() || '';
-
-            if (!studentId || !month || !year || isNaN(amount) || !paymentDate) {
-                throw new Error('Please fill in all required fields!');
-            }
-
-            // Check for duplicate record (excluding current record)
-            const existingRecord = this.feeRecords.find(r => 
-                r.studentId === studentId && 
-                r.month === month && 
-                r.year === year &&
-                r.id !== recordId
-            );
-
-            if (existingRecord) {
-                throw new Error('A record for this student and month already exists!');
-            }
-
-            // Find and update record
-            const recordIndex = this.feeRecords.findIndex(r => r.id === recordId);
-            if (recordIndex !== -1) {
-                this.feeRecords[recordIndex] = {
-                    ...this.feeRecords[recordIndex],
-                    studentId,
-                    month,
-                    year,
-                    amount,
-                    paymentDate,
-                    status,
-                    notes,
-                    lastModified: new Date().toISOString()
-                };
-
-                this.updateStudentTotals(studentId);
-                this.saveData();
-                this.displayStudentsFeeOverview();
-                this.generateReports();
-                
-                this.closeEditFeeModal();
-                this.showToast('Fee record updated successfully! 💰', 'success');
-            }
-
-        } catch (error) {
-            this.showToast(error.message, 'error');
-        } finally {
-            this.hideLoading();
-            setTimeout(() => {
-                submitBtn.disabled = false;
-            }, 1000);
-        }
-    }
-
-    setupAnimations() {
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -100px 0px'
-        };
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.opacity = '1';
-                    entry.target.style.transform = 'translateY(0)';
-                }
-            });
-        }, observerOptions);
-
-        document.querySelectorAll('.student-card, .fee-record, .report-card').forEach(el => {
-            observer.observe(el);
-        });
-    }
-
-    debounce(func, wait) {
-        let timeout;
-        return function executedFunction(...args) {
-            const later = () => {
-                clearTimeout(timeout);
-                func(...args);
-            };
-            clearTimeout(timeout);
-            timeout = setTimeout(later, wait);
-        };
-    }
-
-    showLoading() {
-        document.getElementById('loadingSpinner').style.display = 'flex';
-    }
-
-    hideLoading() {
-        document.getElementById('loadingSpinner').style.display = 'none';
-    }
-
-    showToast(message, type = 'success') {
-        const toast = document.createElement('div');
-        toast.className = `toast ${type}`;
-        
-        const icon = {
-            success: 'fas fa-check-circle',
-            error: 'fas fa-times-circle',
-            warning: 'fas fa-exclamation-triangle',
-            info: 'fas fa-info-circle'
-        };
-
-        toast.innerHTML = `
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <i class="${icon[type]}" style="color: var(--${type === 'success' ? 'success' : type === 'error' ? 'danger' : type === 'warning' ? 'warning' : 'info'}-color);"></i>
-                <span>${message}</span>
-            </div>
-        `;
-
-        document.getElementById('toastContainer').appendChild(toast);
-
-        setTimeout(() => {
-            toast.style.animation = 'slideInRight 0.3s ease-out reverse';
-            setTimeout(() => toast.remove(), 300);
-        }, 3000);
-    }
-
-    resetEventListeners() {
-        const forms = ['studentForm', 'feeForm'];
-        forms.forEach(formId => {
-            const form = document.getElementById(formId);
-            if (form) {
-                const newForm = form.cloneNode(true);
-                form.parentNode.replaceChild(newForm, form);
-            }
-        });
+        if (homeNavBtn) homeNavBtn.onclick = () => this.showSection('homepage');
+        if (studentsNavBtn) studentsNavBtn.onclick = () => this.showSection('students');
+        if (feesNavBtn) feesNavBtn.onclick = () => this.showSection('fees');
+        if (reportsNavBtn) reportsNavBtn.onclick = () => this.showSection('reports');
     }
 
     showSection(section) {
         this.showLoading();
         
         setTimeout(() => {
+            // Update navigation
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.nav-link').forEach(btn => btn.classList.remove('active'));
 
-            document.getElementById(`${section}Section`).classList.add('active');
-            document.getElementById(`${section}Tab`).classList.add('active');
+            // Show section
+            const sectionElement = document.getElementById(`${section}Section`);
+            if (sectionElement) {
+                sectionElement.classList.add('active');
+            }
+            
+            // Update nav button
+            const navBtnMap = {
+                'homepage': 'homeNavBtn',
+                'students': 'studentsNavBtn',
+                'fees': 'feesNavBtn',
+                'reports': 'reportsNavBtn'
+            };
+            
+            const navBtn = document.getElementById(navBtnMap[section]);
+            if (navBtn) {
+                navBtn.classList.add('active');
+            }
 
-            if (section === 'reports') {
+            // Load section specific data
+            if (section === 'homepage') {
+                this.updateHomepageStats();
+                this.displayRecentActivity();
+            } else if (section === 'reports') {
                 this.generateReports();
             } else if (section === 'fees') {
                 this.displayStudentsFeeOverview();
             }
 
-            setTimeout(() => {
-                document.querySelectorAll(`#${section}Section .slide-in`).forEach((el, index) => {
-                    el.style.animationDelay = `${index * 0.1}s`;
-                    el.classList.add('slide-in');
-                });
-            }, 100);
-
             this.hideLoading();
         }, 300);
+    }
+
+    updateHomepageStats() {
+        const totalStudents = this.students.length;
+        const totalRecords = this.feeRecords.length;
+        const paidRecords = this.feeRecords.filter(r => r.status === 'Paid');
+        const pendingRecords = this.feeRecords.filter(r => r.status !== 'Paid');
+        const totalAmount = this.feeRecords.reduce((sum, r) => sum + r.amount, 0);
+        const paidAmount = paidRecords.reduce((sum, r) => sum + r.amount, 0);
+
+        // Update quick access cards
+        const totalStudentsCount = document.getElementById('totalStudentsCount');
+        const totalRecordsCount = document.getElementById('totalRecordsCount');
+        const pendingPaymentsCount = document.getElementById('pendingPaymentsCount');
+        const totalAmountCount = document.getElementById('totalAmountCount');
+
+        if (totalStudentsCount) totalStudentsCount.textContent = totalStudents;
+        if (totalRecordsCount) totalRecordsCount.textContent = totalRecords;
+        if (pendingPaymentsCount) pendingPaymentsCount.textContent = pendingRecords.length;
+        if (totalAmountCount) totalAmountCount.textContent = `₹${totalAmount.toLocaleString()}`;
+
+        // Update stats overview
+        const homeStudentsCount = document.getElementById('homeStudentsCount');
+        const homePaidCount = document.getElementById('homePaidCount');
+        const homePendingCount = document.getElementById('homePendingCount');
+        const homeTotalAmount = document.getElementById('homeTotalAmount');
+
+        if (homeStudentsCount) homeStudentsCount.textContent = totalStudents;
+        if (homePaidCount) homePaidCount.textContent = paidRecords.length;
+        if (homePendingCount) homePendingCount.textContent = pendingRecords.length;
+        if (homeTotalAmount) homeTotalAmount.textContent = `₹${paidAmount.toLocaleString()}`;
+    }
+
+    displayRecentActivity() {
+        const container = document.getElementById('recentActivityList');
+        if (!container) return;
+        
+        // Get recent activities (last 5 records)
+        const recentRecords = this.feeRecords
+            .sort((a, b) => new Date(b.recordDate) - new Date(a.recordDate))
+            .slice(0, 5);
+
+        if (recentRecords.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-history"></i>
+                    <p>No recent activity to display. Start by adding students and recording payments!</p>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = recentRecords.map(record => {
+            const student = this.students.find(s => s.id === record.studentId);
+            const timeAgo = this.getTimeAgo(new Date(record.recordDate));
+            
+            return `
+                <div class="activity-item">
+                    <div class="activity-icon">
+                        <i class="fas fa-${record.status === 'Paid' ? 'check' : record.status === 'Partial' ? 'clock' : 'exclamation'}"></i>
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-title">
+                            ${record.status} payment: ${student?.name || 'Unknown Student'} - ${record.month} ${record.year}
+                        </div>
+                        <div class="activity-time">
+                            ₹${record.amount.toLocaleString()} • ${timeAgo}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    getTimeAgo(date) {
+        const now = new Date();
+        const diffMs = now - date;
+        const diffMins = Math.floor(diffMs / 60000);
+        const diffHours = Math.floor(diffMs / 3600000);
+        const diffDays = Math.floor(diffMs / 86400000);
+
+        if (diffMins < 1) return 'Just now';
+        if (diffMins < 60) return `${diffMins} minutes ago`;
+        if (diffHours < 24) return `${diffHours} hours ago`;
+        if (diffDays < 7) return `${diffDays} days ago`;
+        return date.toLocaleDateString();
+    }
+
+    showToolsMenu() {
+        this.showToast('Tools menu opened! Check the Reports section for more options.', 'info');
+        this.showSection('reports');
     }
 
     addStudent(e) {
         e.preventDefault();
         
         const submitBtn = e.target.querySelector('button[type="submit"]');
-        submitBtn.disabled = true;
+        if (submitBtn) submitBtn.disabled = true;
         this.showLoading();
         
         try {
-            const name = document.getElementById('studentName').value?.trim();
-            const studentClass = document.getElementById('studentClass').value?.trim();
-            const rollNumber = document.getElementById('studentRoll').value?.trim();
-            const monthlyFee = parseFloat(document.getElementById('monthlyFee').value);
-            const parentContact = document.getElementById('parentContact').value?.trim() || '';
-            const joiningDate = document.getElementById('joiningDate').value;
+            const name = document.getElementById('studentName')?.value?.trim();
+            const studentClass = document.getElementById('studentClass')?.value?.trim();
+            const rollNumber = document.getElementById('studentRoll')?.value?.trim();
+            const monthlyFee = parseFloat(document.getElementById('monthlyFee')?.value);
+            const parentContact = document.getElementById('parentContact')?.value?.trim() || '';
+            const joiningDate = document.getElementById('joiningDate')?.value;
 
             if (!name || !studentClass || !rollNumber || isNaN(monthlyFee) || !joiningDate) {
                 throw new Error('Please fill in all required fields correctly!');
@@ -408,18 +292,25 @@ class StudentFeeTracker {
             this.saveData();
             this.displayStudents();
             this.populateStudentDropdowns();
+            this.updateHomepageStats();
             
-            document.getElementById('studentForm').reset();
-            document.getElementById('joiningDate').value = new Date().toISOString().split('T')[0];
+            const form = document.getElementById('studentForm');
+            if (form) form.reset();
+            
+            const joiningDateInput = document.getElementById('joiningDate');
+            if (joiningDateInput) joiningDateInput.value = new Date().toISOString().split('T')[0];
+            
             this.showToast('Student added successfully! 🎉', 'success');
 
         } catch (error) {
             this.showToast(error.message, 'error');
         } finally {
             this.hideLoading();
-            setTimeout(() => {
-                submitBtn.disabled = false;
-            }, 1000);
+            if (submitBtn) {
+                setTimeout(() => {
+                    submitBtn.disabled = false;
+                }, 1000);
+            }
         }
     }
 
@@ -427,19 +318,19 @@ class StudentFeeTracker {
         e.preventDefault();
         
         const submitBtn = e.target.querySelector('button[type="submit"]');
-        submitBtn.disabled = true;
+        if (submitBtn) submitBtn.disabled = true;
         this.showLoading();
         
         try {
             const feeRecord = {
                 id: Date.now().toString() + '_' + Math.random().toString(36).substr(2, 9),
-                studentId: document.getElementById('feeStudent').value,
-                month: document.getElementById('feeMonth').value,
-                year: parseInt(document.getElementById('feeYear').value),
-                amount: parseFloat(document.getElementById('feeAmount').value),
-                paymentDate: document.getElementById('paymentDate').value,
-                status: document.getElementById('paymentStatus').value,
-                notes: document.getElementById('paymentNotes').value?.trim() || '',
+                studentId: document.getElementById('feeStudent')?.value,
+                month: document.getElementById('feeMonth')?.value,
+                year: parseInt(document.getElementById('feeYear')?.value),
+                amount: parseFloat(document.getElementById('feeAmount')?.value),
+                paymentDate: document.getElementById('paymentDate')?.value,
+                status: document.getElementById('paymentStatus')?.value,
+                notes: document.getElementById('paymentNotes')?.value?.trim() || '',
                 recordDate: new Date().toISOString()
             };
 
@@ -467,8 +358,14 @@ class StudentFeeTracker {
             this.updateStudentTotals(feeRecord.studentId);
             this.saveData();
             this.displayStudentsFeeOverview();
-            document.getElementById('feeForm').reset();
-            document.getElementById('paymentDate').value = new Date().toISOString().split('T')[0];
+            this.updateHomepageStats();
+            this.displayRecentActivity();
+            
+            const form = document.getElementById('feeForm');
+            if (form) form.reset();
+            
+            const paymentDateInput = document.getElementById('paymentDate');
+            if (paymentDateInput) paymentDateInput.value = new Date().toISOString().split('T')[0];
             
             this.showToast('Fee record saved successfully! 💰', 'success');
 
@@ -476,9 +373,11 @@ class StudentFeeTracker {
             this.showToast(error.message, 'error');
         } finally {
             this.hideLoading();
-            setTimeout(() => {
-                submitBtn.disabled = false;
-            }, 1000);
+            if (submitBtn) {
+                setTimeout(() => {
+                    submitBtn.disabled = false;
+                }, 1000);
+            }
         }
     }
 
@@ -497,6 +396,7 @@ class StudentFeeTracker {
 
     displayStudents() {
         const container = document.getElementById('studentsList');
+        if (!container) return;
         
         if (this.students.length === 0) {
             container.innerHTML = `
@@ -578,17 +478,11 @@ class StudentFeeTracker {
                 </div>
             `;
         }).join('');
-
-        setTimeout(() => {
-            document.querySelectorAll('.student-card').forEach(card => {
-                card.style.opacity = '1';
-                card.style.transform = 'translateY(0)';
-            });
-        }, 100);
     }
 
     displayStudentsFeeOverview() {
         const container = document.getElementById('studentsListView');
+        if (!container) return;
         
         if (this.students.length === 0) {
             container.innerHTML = `
@@ -607,8 +501,6 @@ class StudentFeeTracker {
             const partialRecords = studentRecords.filter(r => r.status === 'Partial');
             
             const totalPaid = paidRecords.reduce((sum, r) => sum + r.amount, 0);
-            const totalPending = pendingRecords.reduce((sum, r) => sum + r.amount, 0);
-            const totalPartial = partialRecords.reduce((sum, r) => sum + r.amount, 0);
             
             let status = 'up-to-date';
             if (pendingRecords.length > 0) status = 'pending';
@@ -625,8 +517,6 @@ class StudentFeeTracker {
                 pendingCount: pendingRecords.length,
                 partialCount: partialRecords.length,
                 totalPaid,
-                totalPending,
-                totalPartial,
                 status,
                 recentPayments
             };
@@ -672,52 +562,27 @@ class StudentFeeTracker {
                     </div>
                 </div>
 
-                ${student.recentPayments.length > 0 ? `
-                    <div class="recent-payments">
-                        <div class="recent-payments-title">
-                            <i class="fas fa-history"></i>
-                            Recent Payments
-                        </div>
-                        ${student.recentPayments.map(payment => `
-                            <div class="recent-payment-item">
-                                <span class="recent-payment-month">${payment.month} ${payment.year}</span>
-                                <span class="recent-payment-status ${payment.status.toLowerCase()}">${payment.status}</span>
-                            </div>
-                        `).join('')}
-                    </div>
-                ` : `
-                    <div class="recent-payments">
-                        <div class="recent-payments-title" style="color: var(--text-secondary); text-align: center;">
-                            <i class="fas fa-info-circle"></i>
-                            No payment records yet
-                        </div>
-                    </div>
-                `}
-
                 <div style="margin-top: 20px; text-align: center; color: var(--text-secondary); font-size: 0.9rem;">
                     <i class="fas fa-mouse-pointer"></i>
                     Click to view detailed payment history
                 </div>
             </div>
         `).join('');
-
-        setTimeout(() => {
-            document.querySelectorAll('.student-fee-card').forEach(card => {
-                card.classList.add('fade-in');
-            });
-        }, 100);
     }
 
     showStudentFeeDetail(studentId) {
         const student = this.students.find(s => s.id === studentId);
         if (!student) return;
 
-        const studentRecords = this.feeRecords.filter(r => r.studentId === studentId);
-        
-        document.getElementById('studentsListView').style.display = 'none';
-        document.getElementById('studentDetailView').style.display = 'block';
-        document.getElementById('backToStudentsList').style.display = 'inline-flex';
+        const studentsListView = document.getElementById('studentsListView');
+        const studentDetailView = document.getElementById('studentDetailView');
+        const backToStudentsList = document.getElementById('backToStudentsList');
 
+        if (studentsListView) studentsListView.style.display = 'none';
+        if (studentDetailView) studentDetailView.style.display = 'block';
+        if (backToStudentsList) backToStudentsList.style.display = 'inline-flex';
+
+        const studentRecords = this.feeRecords.filter(r => r.studentId === studentId);
         const currentYear = new Date().getFullYear();
         const months = [
             'January', 'February', 'March', 'April', 'May', 'June',
@@ -743,10 +608,6 @@ class StudentFeeTracker {
                 <div class="student-detail-name">
                     <i class="fas fa-user-circle"></i>
                     ${this.escapeHtml(student.name)}
-                    <button class="edit-btn" onclick="window.feeTracker.openEditStudentModal('${student.id}')" style="margin-left: 20px;">
-                        <i class="fas fa-edit"></i>
-                        Edit Student
-                    </button>
                 </div>
                 <div class="student-detail-info">
                     <div><i class="fas fa-school"></i> Class: ${this.escapeHtml(student.class)}</div>
@@ -796,10 +657,6 @@ class StudentFeeTracker {
                                     }">
                                         ₹${monthData.record.amount.toLocaleString()}
                                     </div>
-                                    <button class="edit-btn" onclick="window.feeTracker.openEditFeeModal('${monthData.record.id}')">
-                                        <i class="fas fa-edit"></i>
-                                        Edit
-                                    </button>
                                 ` : `
                                     <div class="payment-amount" style="color: var(--text-secondary); font-size: 0.9rem;">
                                         No Record
@@ -817,7 +674,6 @@ class StudentFeeTracker {
                                 <div><strong>Payment Date:</strong> ${this.formatDate(monthData.record.paymentDate)}</div>
                                 <div><strong>Expected:</strong> ₹${student.monthlyFee.toLocaleString()}</div>
                                 ${monthData.record.notes ? `<div><strong>Notes:</strong> ${this.escapeHtml(monthData.record.notes)}</div>` : ''}
-                                ${monthData.record.lastModified ? `<div style="color: var(--warning-color);"><strong>Modified:</strong> ${this.formatDate(monthData.record.lastModified.split('T')[0])}</div>` : ''}
                             </div>
                         ` : `
                             <div class="payment-details" style="text-align: center; color: var(--text-secondary);">
@@ -835,25 +691,26 @@ class StudentFeeTracker {
             </div>
         `;
 
-        document.getElementById('studentDetailContent').innerHTML = detailContent;
-
-        setTimeout(() => {
-            document.querySelectorAll('.month-payment-card').forEach((card, index) => {
-                card.style.animationDelay = `${index * 0.05}s`;
-                card.classList.add('slide-in');
-            });
-        }, 100);
+        const studentDetailContent = document.getElementById('studentDetailContent');
+        if (studentDetailContent) {
+            studentDetailContent.innerHTML = detailContent;
+        }
     }
 
     showStudentsListView() {
-        document.getElementById('studentsListView').style.display = 'grid';
-        document.getElementById('studentDetailView').style.display = 'none';
-        document.getElementById('backToStudentsList').style.display = 'none';
+        const studentsListView = document.getElementById('studentsListView');
+        const studentDetailView = document.getElementById('studentDetailView');
+        const backToStudentsList = document.getElementById('backToStudentsList');
+
+        if (studentsListView) studentsListView.style.display = 'grid';
+        if (studentDetailView) studentDetailView.style.display = 'none';
+        if (backToStudentsList) backToStudentsList.style.display = 'none';
     }
 
     filterStudentsByPaymentStatus(status) {
         document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-        document.getElementById(`show${status.charAt(0).toUpperCase() + status.slice(1)}Students`).classList.add('active');
+        const activeBtn = document.getElementById(`show${status.charAt(0).toUpperCase() + status.slice(1)}Students`);
+        if (activeBtn) activeBtn.classList.add('active');
         
         const cards = document.querySelectorAll('.student-fee-card');
         
@@ -875,8 +732,8 @@ class StudentFeeTracker {
         const cards = document.querySelectorAll('.student-fee-card');
         
         cards.forEach(card => {
-            const studentName = card.querySelector('.student-fee-name').textContent.toLowerCase();
-            const studentInfo = card.querySelector('.student-fee-class').textContent.toLowerCase();
+            const studentName = card.querySelector('.student-fee-name')?.textContent?.toLowerCase() || '';
+            const studentInfo = card.querySelector('.student-fee-class')?.textContent?.toLowerCase() || '';
             
             const shouldShow = !query || 
                               studentName.includes(query.toLowerCase()) || 
@@ -903,6 +760,7 @@ class StudentFeeTracker {
         );
 
         const container = document.getElementById('studentsList');
+        if (!container) return;
         
         if (filteredStudents.length === 0 && query) {
             container.innerHTML = `
@@ -996,6 +854,7 @@ class StudentFeeTracker {
             this.saveData();
             this.displayStudents();
             this.populateStudentDropdowns();
+            this.updateHomepageStats();
             this.showToast('Student deleted successfully', 'success');
         }
     }
@@ -1008,6 +867,8 @@ class StudentFeeTracker {
 
     generateMonthlySummary() {
         const container = document.getElementById('monthlySummary');
+        if (!container) return;
+        
         const currentYear = new Date().getFullYear();
         
         const monthlyData = {};
@@ -1063,6 +924,7 @@ class StudentFeeTracker {
 
     generatePaymentOverview() {
         const container = document.getElementById('paymentOverview');
+        if (!container) return;
         
         const paidRecords = this.feeRecords.filter(r => r.status === 'Paid');
         const pendingRecords = this.feeRecords.filter(r => r.status === 'Pending');
@@ -1098,6 +960,7 @@ class StudentFeeTracker {
 
     generateOutstandingFees() {
         const container = document.getElementById('outstandingFees');
+        if (!container) return;
         
         const outstandingStudents = this.students.map(student => {
             const studentRecords = this.feeRecords.filter(r => r.studentId === student.id);
@@ -1161,6 +1024,26 @@ class StudentFeeTracker {
         `;
     }
 
+    // Add empty placeholder methods for edit functionality
+    openEditStudentModal(studentId) {
+        this.showToast('Edit functionality coming soon!', 'info');
+    }
+
+    updateStudent(e) {
+        e.preventDefault();
+        this.showToast('Edit functionality coming soon!', 'info');
+    }
+
+    openEditFeeModal(recordId) {
+        this.showToast('Edit functionality coming soon!', 'info');
+    }
+
+    updateFeeRecord(e) {
+        e.preventDefault();
+        this.showToast('Edit functionality coming soon!', 'info');
+    }
+
+    // Export methods
     exportStudents() {
         this.showLoading();
         
@@ -1296,6 +1179,8 @@ class StudentFeeTracker {
                     this.populateStudentDropdowns();
                     this.displayFeeRecords();
                     this.generateReports();
+                    this.updateHomepageStats();
+                    this.displayRecentActivity();
                     
                     this.hideLoading();
                     this.showToast('All data has been cleared!', 'success');
@@ -1333,6 +1218,68 @@ class StudentFeeTracker {
             "'": '&#039;'
         };
         return text.toString().replace(/[&<>"']/g, m => map[m]);
+    }
+
+    setupAnimations() {
+        // Simple animation setup - no complex observers for debugging
+        const cards = document.querySelectorAll('.student-card, .fee-record, .report-card');
+        cards.forEach((card, index) => {
+            if (card) {
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }
+        });
+    }
+
+    debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+
+    showLoading() {
+        const spinner = document.getElementById('loadingSpinner');
+        if (spinner) spinner.style.display = 'flex';
+    }
+
+    hideLoading() {
+        const spinner = document.getElementById('loadingSpinner');
+        if (spinner) spinner.style.display = 'none';
+    }
+
+    showToast(message, type = 'success') {
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        
+        const icon = {
+            success: 'fas fa-check-circle',
+            error: 'fas fa-times-circle',
+            warning: 'fas fa-exclamation-triangle',
+            info: 'fas fa-info-circle'
+        };
+
+        toast.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <i class="${icon[type]}" style="color: var(--${type === 'success' ? 'success' : type === 'error' ? 'danger' : type === 'warning' ? 'warning' : 'info'}-color);"></i>
+                <span>${message}</span>
+            </div>
+        `;
+
+        const container = document.getElementById('toastContainer');
+        if (container) {
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.animation = 'slideInRight 0.3s ease-out reverse';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
     }
 }
 
